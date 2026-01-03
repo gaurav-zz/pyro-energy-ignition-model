@@ -12,7 +12,7 @@ Pyrotechnic igniters are energy-driven, not time- or current-driven.
 
 Ignition occurs when sufficient thermal energy is deposited in the igniter bridgewire:
 
-$$E(t) = \int_0^t I^2(t) \cdot R_{\text{ign}} \, dt$$
+$$E(t) = \int_0^t I^2(t) \cdot R_{\text{ign}} \ dt$$
 
 Instead of assuming a fixed delay, this model:
 - Computes the minimum required firing time analytically
