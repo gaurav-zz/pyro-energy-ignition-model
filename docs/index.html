@@ -156,8 +156,32 @@
     </div>
   </div>
 
-  <script src="dist/ignition.js"></script>
   <script>
+    /**
+     * Energy-based pyrotechnic ignition timing calculation.
+     */
+    function ignitionTimeMin(E_req, V_oc, R_ign, R_wire, R_bat, R_mos) {
+      if (E_req <= 0 || V_oc <= 0 || R_ign <= 0) {
+        return 0;
+      }
+
+      const R_total = R_ign + R_wire + R_bat + R_mos;
+
+      if (R_total <= 0) {
+        return 0;
+      }
+
+      return (E_req * R_total * R_total) / (V_oc * V_oc * R_ign);
+    }
+
+    function ignitionTimeFire(t_min, safetyFactor) {
+      if (t_min <= 0 || safetyFactor <= 0) {
+        return 0;
+      }
+
+      return t_min * safetyFactor;
+    }
+
     function compute() {
       const E = Number(document.getElementById("E_req").value);
       const V = Number(document.getElementById("V_oc").value);
@@ -174,6 +198,9 @@
         `Minimum ignition time : ${tmin.toFixed(5)} s\n` +
         `Commanded fire time   : ${tfire.toFixed(5)} s`;
     }
+
+    // Auto-calculate on page load
+    window.addEventListener('DOMContentLoaded', compute);
 
     // Optional: auto-recalculate on input change
     document
