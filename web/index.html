@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pyrotechnic Ignition Timing Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 720px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+    }
+    input {
+      width: 100%;
+      padding: 0.4rem;
+    }
+    .result {
+      margin-top: 1.5rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Ignition Timing Calculator</h1>
+
+<p>
+This page computes a conservative pyrotechnic ignition time using
+an energy-based analytical model.
+</p>
+
+<label>Required Ignition Energy (J)
+  <input id="E_req" type="number" step="0.01" value="2.0">
+</label>
+
+<label>Battery Voltage (V)
+  <input id="V_oc" type="number" step="0.1" value="12.0">
+</label>
+
+<label>Igniter Resistance (Ω)
+  <input id="R_ign" type="number" step="0.01" value="1.5">
+</label>
+
+<label>Wiring Resistance (Ω)
+  <input id="R_wire" type="number" step="0.01" value="0.15">
+</label>
+
+<label>Battery Internal Resistance (Ω)
+  <input id="R_bat" type="number" step="0.01" value="0.10">
+</label>
+
+<label>MOSFET On Resistance (Ω)
+  <input id="R_mos" type="number" step="0.001" value="0.02">
+</label>
+
+<label>Safety Factor
+  <input id="SF" type="number" step="0.1" value="3.0">
+</label>
+
+<div class="result" id="output"></div>
+
+<script src="dist/ignition.js"></script>
+<script>
+  function compute() {
+    const E = Number(E_req.value);
+    const V = Number(V_oc.value);
+    const Rign = Number(R_ign.value);
+    const Rwire = Number(R_wire.value);
+    const Rbat = Number(R_bat.value);
+    const Rmos = Number(R_mos.value);
+    const SF = Number(SF_input.value);
+
+    const tmin = ignitionTimeMin(E, V, Rign, Rwire, Rbat, Rmos);
+    const tfire = ignitionTimeFire(tmin, SF);
+
+    output.innerText =
+      `Minimum time: ${tmin.toFixed(4)} s\n` +
+      `Commanded time: ${tfire.toFixed(4)} s`;
+  }
+
+  const inputs = document.querySelectorAll("input");
+  inputs.forEach(i => i.addEventListener("input", compute));
+
+  const SF_input = document.getElementById("SF");
+  compute();
+</script>
+
+<hr>
+
+<p><strong>Disclaimer:</strong> Educational use only. Not flight-certified.</p>
+
+</body>
+</html>
