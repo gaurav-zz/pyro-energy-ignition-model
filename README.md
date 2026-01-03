@@ -76,16 +76,10 @@ pyro-energy-ignition-model/
 │   ├── pyro_model_basic.slx
 │   └── README.md
 ├── docs/
+│   ├── index.html
 │   ├── theory.md
 │   ├── assumptions.md
 │   └── limitations.md
-├── web/
-│   ├── index.html
-│   ├── src/
-│   │   └── ignition.ts
-│   ├── dist/
-│   │   └── ignition.js
-│   └── README.md
 ├── images/
 │   ├── block_diagram.png
 │   └── energy_plot.png
