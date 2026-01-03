@@ -1,99 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Pyrotechnic Ignition Timing Calculator</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <title>Ignition Timing Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
-    body {
-      font-family: system-ui, sans-serif;
-      max-width: 720px;
-      margin: 2rem auto;
-      padding: 0 1rem;
+    :root {
+      --bg: #0f1115;
+      --card: #171a21;
+      --text: #e6e6e6;
+      --muted: #9aa4b2;
+      --accent: #4da3ff;
+      --border: #2a2f3a;
     }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: auto;
+      background: var(--card);
+      padding: 2rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 1.8rem;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
     label {
       display: block;
-      margin-top: 1rem;
+      margin-top: 1.2rem;
+      font-size: 0.9rem;
+      color: var(--muted);
     }
+
     input {
       width: 100%;
-      padding: 0.4rem;
+      margin-top: 0.3rem;
+      padding: 0.55rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: #0c0e13;
+      color: var(--text);
+      font-size: 0.95rem;
     }
-    .result {
-      margin-top: 1.5rem;
-      font-weight: bold;
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    button {
+      margin-top: 1.8rem;
+      padding: 0.7rem 1.2rem;
+      font-size: 0.95rem;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background: var(--accent);
+      color: #000;
+      font-weight: 600;
+    }
+
+    .output {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #0c0e13;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: monospace;
+      white-space: pre-line;
+    }
+
+    .divider {
+      margin: 2rem 0 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .disclaimer {
+      font-size: 0.8rem;
+      color: var(--muted);
     }
   </style>
 </head>
+
 <body>
+  <div class="container">
+    <h1>Ignition Timing Calculator</h1>
 
-<h1>Ignition Timing Calculator</h1>
+    <p>
+      This page computes a conservative pyrotechnic ignition time using an
+      energy-based analytical model.
+    </p>
 
-<p>
-This page computes a conservative pyrotechnic ignition time using
-an energy-based analytical model.
-</p>
+    <label>
+      Required Ignition Energy (J)
+      <input id="E_req" type="number" step="0.01" value="2.0" />
+    </label>
 
-<label>Required Ignition Energy (J)
-  <input id="E_req" type="number" step="0.01" value="2.0">
-</label>
+    <label>
+      Battery Voltage (V)
+      <input id="V_oc" type="number" step="0.1" value="11.6" />
+    </label>
 
-<label>Battery Voltage (V)
-  <input id="V_oc" type="number" step="0.1" value="12.0">
-</label>
+    <label>
+      Igniter Resistance (Ω)
+      <input id="R_ign" type="number" step="0.01" value="1.5" />
+    </label>
 
-<label>Igniter Resistance (Ω)
-  <input id="R_ign" type="number" step="0.01" value="1.5">
-</label>
+    <label>
+      Wiring Resistance (Ω)
+      <input id="R_wire" type="number" step="0.01" value="0.15" />
+    </label>
 
-<label>Wiring Resistance (Ω)
-  <input id="R_wire" type="number" step="0.01" value="0.15">
-</label>
+    <label>
+      Battery Internal Resistance (Ω)
+      <input id="R_bat" type="number" step="0.01" value="0.10" />
+    </label>
 
-<label>Battery Internal Resistance (Ω)
-  <input id="R_bat" type="number" step="0.01" value="0.10">
-</label>
+    <label>
+      MOSFET On Resistance (Ω)
+      <input id="R_mos" type="number" step="0.001" value="0.03" />
+    </label>
 
-<label>MOSFET On Resistance (Ω)
-  <input id="R_mos" type="number" step="0.001" value="0.02">
-</label>
+    <label>
+      Safety Factor
+      <input id="SF" type="number" step="0.1" value="3.0" />
+    </label>
 
-<label>Safety Factor
-  <input id="SF" type="number" step="0.1" value="3.0">
-</label>
+    <button onclick="compute()">Calculate</button>
 
-<div class="result" id="output"></div>
+    <div class="output" id="output">
+      Click “Calculate” to compute ignition timing.
+    </div>
 
-<script src="dist/ignition.js"></script>
-<script>
-  function compute() {
-    const E = Number(E_req.value);
-    const V = Number(V_oc.value);
-    const Rign = Number(R_ign.value);
-    const Rwire = Number(R_wire.value);
-    const Rbat = Number(R_bat.value);
-    const Rmos = Number(R_mos.value);
-    const SF = Number(SF_input.value);
+    <div class="divider"></div>
 
-    const tmin = ignitionTimeMin(E, V, Rign, Rwire, Rbat, Rmos);
-    const tfire = ignitionTimeFire(tmin, SF);
+    <div class="disclaimer">
+      <strong>Disclaimer:</strong> Educational use only. Not flight-certified.
+    </div>
+  </div>
 
-    output.innerText =
-      `Minimum time: ${tmin.toFixed(4)} s\n` +
-      `Commanded time: ${tfire.toFixed(4)} s`;
-  }
+  <script src="dist/ignition.js"></script>
+  <script>
+    function compute() {
+      const E = Number(document.getElementById("E_req").value);
+      const V = Number(document.getElementById("V_oc").value);
+      const Rign = Number(document.getElementById("R_ign").value);
+      const Rwire = Number(document.getElementById("R_wire").value);
+      const Rbat = Number(document.getElementById("R_bat").value);
+      const Rmos = Number(document.getElementById("R_mos").value);
+      const SF = Number(document.getElementById("SF").value);
 
-  const inputs = document.querySelectorAll("input");
-  inputs.forEach(i => i.addEventListener("input", compute));
+      const tmin = ignitionTimeMin(E, V, Rign, Rwire, Rbat, Rmos);
+      const tfire = ignitionTimeFire(tmin, SF);
 
-  const SF_input = document.getElementById("SF");
-  compute();
-</script>
+      document.getElementById("output").innerText =
+        `Minimum ignition time : ${tmin.toFixed(5)} s\n` +
+        `Commanded fire time   : ${tfire.toFixed(5)} s`;
+    }
 
-<hr>
-
-<p><strong>Disclaimer:</strong> Educational use only. Not flight-certified.</p>
-
+    // Optional: auto-recalculate on input change
+    document
+      .querySelectorAll("input")
+      .forEach(el => el.addEventListener("input", compute));
+  </script>
 </body>
 </html>
